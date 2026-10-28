@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="shortcut icon" href="logotipo.png" sizes="26x26">
+    <title>Score Logic — Sistema Escolar</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+           
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f5;
+            color: #173b2d;
+            font-size: 14px;
+            
+        }
+
+        header {
+            background: #16824b;
+            color: #fff;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin: 0;
+        }
+
+        header small {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 16px auto;
+            padding: 0 16px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 6px;
+            padding: 7px 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .green {
+            background: #16824b;
+            color: #fff;
+        }
+
+        .orange {
+            background: #f28c28;
+            color: #fff;
+        }
+
+        .gray {
+            background: #e8eee9;
+            color: #173b2d;
+        }
+
+        .danger {
+            background: #d9534f;
+            color: #fff;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 10px rgba(23, 59, 45, 0.08);
+            margin-bottom: 14px;
+            border-color: #16824b;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+        }
+
+        .stat {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .muted {
+            color: #6b7b73;
+            font-size: 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        nav {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        nav button {
+            background: #e8eee9;
+            color: #173b2d;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        nav button.green {
+            background: #16824b;
+            color: #fff;
+        }
+
+        .classcard {
+            padding: 12px;
+            text-align: center;
+        }
+
+        .classcard img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .classcard h3 {
+            font-size: 15px;
+            margin: 4px 0;
+        }
+
+        .classcard .points {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 2px 0;
+        }
+
+        .classcard .muted {
+            font-size: 11px;
+        }
+
+        .classcard .actions {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .classcard .actions button {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+
+        .rank {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5ebe7;
+        }
+
+        .rank:last-child {
+            border-bottom: none;
+        }
+
+        .rank img {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .pos {
+            font-size: 18px;
+            font-weight: bold;
+            width: 32px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .rank .points {
+            font-size: 18px;
+            font-weight: bold;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .positive {
+            color: #16824b;
+        }
+
+        .negative {
+            color: #c83b35;
+        }
+
+        .points-hidden {
+            color: #999;
+            font-size: 14px;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 8px 10px;
+            border-bottom: 1px solid #e5ebe7;
+        }
+
+        th {
+            background: #f4f7f5;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7b73;
+            letter-spacing: 0.5px;
+        }
+
+        td .actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        td .actions button {
+            font-size: 11px;
+            padding: 4px 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccd8d1;
+            border-radius: 6px;
+            margin: 4px 0 10px;
+            font-size: 13px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 13px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 5;
+        }
+
+        .box {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .box h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .login {
+            max-width: 380px;
+            margin: 60px auto;
+            border: 8px solid #16824b;
+
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            color: #16824b;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e7f5ec;
+            color: #16824b;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .badge-negative {
+            background: #fde8e8;
+            color: #c83b35;
+        }
+
+        .preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid #e8eee9;
+            margin: 4px 0 10px;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .flex-row input[type="number"] {
+            width: 120px;
+            margin: 0;
+        }
+
+        .locked-badge {
+            background: #f28c28;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-8 {
+            margin-top: 8px;
+        }
+
+        .mb-4 {
+            margin-bottom: 4px;
+        }
+
+        .gap-4 {
+            gap: 4px;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #6b7b73;
+            margin-top: 2px;
+            display: block;
+        }
+
+        .my-class {
+            background: #e8f5e9;
+            border-radius: 10px;
+            border: 2px solid #16824b;
+        }
+
+        .btn-block {
+            background: #d9534f;
+            color: #fff;
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-block:hover {
+            opacity: 0.8;
+        }
+
+        .btn-unblock {
+            background: #16824b;
+            color: #fff;
+            padding: 8px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-unblock:hover {
+            opacity: 0.8;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding: 8px 0;
+        }
+
+        .img{
+            height: 175px;
+            width: auto;
+        }
+        .logo{
+            height: 75px;
+            width: auto;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+
+            .rank {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .rank .points {
+                margin-left: 0;
+                width: 100%;
+                text-align: right;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th,
+            td {
+                padding: 6px 6px;
+            }
+
+            .box {
+                padding: 16px;
+                margin: 10px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav button {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginScreen">
+        <div class=" card login" >
+            <div class="login-logo"><img src="logotipo.png" class="img"></div> 
+            <label>Usuário</label>
+            <input id="loginUser" placeholder="">
+            <label>Senha</label>
+            <input id="loginPass" type="password" placeholder="">
+            <button class="green w-full" onclick="login()">Entrar</button>
+            <p id="loginError" class="negative text-center mt-8"></p>
+        </div>
+    </div>
+
+    <div id="system" class="hidden">
+        <header>
+            <div>
+                
+                <h1>Score Logic</h1>
+                <small>Ranking escolar</small>
+            </div>
+            <div>
+                <span id="who"></span>
+                <button class="gray" onclick="logout()">Sair</button>
+            </div>
+        </header>
+        <div class="wrap">
+            <div id="nav"></div>
+            <div id="app"></div>
+             <div class="login-logo"><img src="logotipo.png" class="img"></div>
+        </div>
+    </div>
+
+    <div id="modal"></div>
+
+    <script>
+        const seed = {
+            settings: { school: "ScoreLogic", blockRanking: false },
+            users: [{ id: "u0", username: "direcao", password: "admin123", role: "direcao", classId: null }],
+            classes: [],
+            activities: [],
+            scores: [],
+            history: []
+        };
+
+        let db = JSON.parse(localStorage.getItem("scorelogicLoginDB") || "null") || seed;
+        let session = null;
+        let page = "dashboard";
+
+        function save() {
+            localStorage.setItem("scorelogicLoginDB", JSON.stringify(db));
+        }
+
+        function esc(x) {
+            return String(x ?? "").replace(/[&<>"']/g, m => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[m]));
+        }
+
+        function cls(id) {
+            return db.classes.find(c => c.id == id);
+        }
+
+        function sorted() {
+            return [...db.classes].sort((a, b) => b.points - a.points);
+        }
+
+        function log(a, d) {
+            db.history.push({ date: new Date().toLocaleString("pt-BR"), action: a, details: d });
+        }
+
+        function login() {
+            let u = loginUser.value.trim();
+            let p = loginPass.value;
+            let found = db.users.find(x => x.username === u && x.password === p);
+            if (!found) {
+                loginError.textContent = "Usuário ou senha incorretos.";
+                return;
+            }
+            session = found;
+            loginScreen.classList.add("hidden");
+            system.classList.remove("hidden");
+            buildNav();
+            show(found.role === "direcao" ? "dashboard" : "classHome");
+        }
+
+        function logout() {
+            session = null;
+            system.classList.add("hidden");
+            loginScreen.classList.remove("hidden");
+            loginUser.value = "";
+            loginPass.value = "";
+        }
+
+        function buildNav() {
+            if (session.role === "direcao") {
+                nav.innerHTML = `
+                    <nav>
+                        <button class="green" onclick="show('dashboard')">Dashboard</button>
+                        <button onclick="show('classes')">🏫 Turmas</button>
+                        <button onclick="show('activities')">📝 Atividades</button>
+                        <button onclick="show('scores')">⭐ Pontuações</button>
+                        <button onclick="show('ranking')">🏆 Ranking</button>
+                        <button onclick="show('users')">🔐 Logins</button>
+                        <button onclick="show('history')">📜 Histórico</button>
+                        <button onclick="show('settings')">🔒 Ocultar pontuações</button>
+                    </nav>
+                `;
+            } else {
+                nav.innerHTML = `
+                    <nav>
+                        <button class="green" onclick="show('classHome')">🏫 Minha turma</button>
+                        <button onclick="show('ranking')">🏆 Ranking</button>
+                    </nav>
+                `;
+            }
+        }
+
+        function show(p) {
+            page = p;
+            let a = app;
+
+            if (p === "dashboard") {
+                a.innerHTML = `
+                    <div class="grid">
+                        <div class="card stat">🏫 ${db.classes.length}<div class="muted">Turmas</div></div>
+                        <div class="card stat">⭐ ${db.classes.reduce((s, c) => s + c.points, 0)}<div class="muted">Pontos totais</div></div>
+                        <div class="card stat">🔐 ${db.users.length}<div class="muted">Logins</div></div>
+                        <div class="card stat">🥇 ${sorted()[0]?.name || "—"}<div class="muted">Líder</div></div>
+                    </div>
+                    <div class="card"><h2>🏆 Ranking</h2>${rank()}</div>
+                `;
+            }
+
+            if (p === "classes") {
+                a.innerHTML = `
+                    <div class="card">
+                        <button class="green" onclick="classModal()">+ Nova turma</button>
+                        <p class="muted mt-8">O brasão é selecionado diretamente dos arquivos do computador e aparece no card e no ranking.</p>
+                    </div>
+                    <div class="grid">
+                        ${db.classes.map(c => `
+                            <div class="card classcard">
+                                <img src="${c.image || placeholder(c.name)}" alt="${esc(c.name)}">
+                                <h3>${esc(c.name)}</h3>
+                                <div class="points ${c.points < 0 ? 'negative' : 'positive'}">${c.points} pts</div>
+                                <div class="muted">Login: <b>${esc(c.username)}</b></div>
+                                <div class="actions">
+                                    <button class="gray" onclick="classModal(${c.id})">Editar</button>
+                                    <button class="danger" onclick="delClass(${c.id})">Excluir</button>
+                                </div>
+                            </div>
+                        `).join("")}
+                    </div>
+                `;
+            }
+
+            if (p === "activities") {
+                a.innerHTML = `
+                    <div class="card">
+                        <button class="orange" onclick="activityModal()">+ Nova atividade</button>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <tr>
+                                <th>Atividade</th>
+                                <th>Descrição</th>
+                                <th>Valor padrão</th>
+                                <th style="text-align:right">Ações</th>
+                            </tr>
+                            ${db.activities.map(x => `
+                                <tr>
+                                    <td><b>${esc(x.name)}</b></td>
+                                    <td>${esc(x.description)}</td>
+                                    <td class="${x.defaultValue < 0 ? 'negative' : 'positive'}">${x.defaultValue > 0 ? '+' : ''}${x.defaultValue}</td>
+                                    <td style="text-align:right">
+                                        <div class="actions" style="justify-content:flex-end">
+                                            <button class="gray" onclick="activityModal(${x.id})">Editar</button>
+                                            <button class="danger" onclick="delActivity(${x.id})">Excluir</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (p === "scores") {
+                a.innerHTML = `
+                    <div class="card">
+                        <button class="orange" onclick="scoreModal()">+ Lançar pontuação</button>
+                        <p class="muted mt-8">Use valores positivos ou negativos. O valor padrão da atividade pode ser editado no lançamento.</p>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <tr>
+                                <th>Turma</th>
+                                <th>Atividade</th>
+                                <th>Pontos</th>
+                                <th>Data</th>
+                                <th style="text-align:right">Ações</th>
+                            </tr>
+                            ${db.scores.slice().reverse().map(s => `
+                                <tr>
+                                    <td>${esc(cls(s.c)?.name)}</td>
+                                    <td>${esc(db.activities.find(x => x.id == s.a)?.name)}</td>
+                                    <td class="${s.p < 0 ? 'negative' : 'positive'}"><b>${s.p > 0 ? "+" : ""}${s.p}</b></td>
+                                    <td>${s.date}</td>
+                                    <td style="text-align:right">
+                                        <button class="danger" onclick="removeScore(${s.id})" style="font-size:11px;padding:3px 8px;">Excluir</button>
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (p === "ranking") {
+                let isBlocked = db.settings.blockRanking && session.role !== "direcao";
+                let blockMsg = isBlocked ?
+                    `<div class="card" style="background:#fff3e0;border-left:4px solid #f28c28">
+                        <p style="margin:0;color:#8d6e3f;font-size:13px;">🔒 <b>Pontuações ocultas</b> — Apenas a pontuação da sua turma está visível.</p>
+                    </div>` :
+                    '';
+                a.innerHTML = `
+                    <div class="card"><h2>🏆 Ranking das Turmas</h2>${rank(isBlocked)}</div>
+                    ${blockMsg}
+                `;
+            }
+
+            if (p === "users") {
+                a.innerHTML = `
+                    <div class="card">
+                        <button class="green" onclick="userModal()">+ Criar login de turma</button>
+                        <p class="muted mt-8">A direção gerencia os usuários e senhas das turmas.</p>
+                    </div>
+                    <div class="card">
+                        <table>
+                            <tr>
+                                <th>Turma</th>
+                                <th>Usuário</th>
+                                <th>Senha</th>
+                                <th style="text-align:right">Ações</th>
+                            </tr>
+                            ${db.classes.map(c => `
+                                <tr>
+                                    <td><b>${esc(c.name)}</b></td>
+                                    <td>${esc(c.username)}</td>
+                                    <td>${esc(c.password)}</td>
+                                    <td style="text-align:right">
+                                        <button class="gray" onclick="userModal(${c.id})" style="font-size:12px;padding:4px 10px;">Alterar</button>
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </table>
+                    </div>
+                    <div class="card">
+                        <b>Direção</b><br>
+                        <span class="muted">Usuário: direcao</span><br>
+                        <span class="muted">Senha: admin123</span>
+                    </div>
+                `;
+            }
+
+            if (p === "history") {
+                a.innerHTML = `
+                    <div class="card">
+                        <h2>📜 Histórico</h2>
+                        <table>
+                            <tr>
+                                <th>Data</th>
+                                <th>Ação</th>
+                                <th>Detalhes</th>
+                            </tr>
+                            ${db.history.slice().reverse().map(h => `
+                                <tr>
+                                    <td style="font-size:12px;white-space:nowrap;">${h.date}</td>
+                                    <td>${esc(h.action)}</td>
+                                    <td>${esc(h.details)}</td>
+                                </tr>
+                            `).join("")}
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (p === "settings") {
+                let isBlocked = db.settings.blockRanking;
+                a.innerHTML = `
+                    <div class="card">
+                        <h2>🔒 Ocultar pontuações</h2>
+                        <div class="config-row">
+                            <span><b>Ocultar pontuações das outras turmas:</b></span>
+                            ${isBlocked ? 
+                                `<button class="btn-unblock" onclick="toggleRankingBlock()">🔓 Liberar pontuações</button>` :
+                                `<button class="btn-block" onclick="toggleRankingBlock()">🔒 Ocultar pontuações</button>`
+                            }
+                            <span class="locked-badge" style="background:${isBlocked ? '#d9534f' : '#16824b'}">
+                                ${isBlocked ? 'OCULTAS' : 'VISÍVEIS'}
+                            </span>
+                        </div>
+                        <p class="muted">Quando ativado, as turmas veem a posição de todos no ranking, mas apenas os pontos da própria turma.</p>
+                    </div>
+                `;
+            }
+
+            if (p === "classHome") {
+                let c = cls(session.classId);
+                let pos = sorted().findIndex(x => x.id == c.id) + 1;
+                let isBlocked = db.settings.blockRanking && session.role !== "direcao";
+                
+                a.innerHTML = `
+                    <div class="card">
+                        <div class="flex items-center gap-4" style="gap:16px;flex-wrap:wrap;">
+                            <img class="preview" src="${c.image || placeholder(c.name)}" alt="${esc(c.name)}">
+                            <div>
+                                <h2 style="font-size:20px;margin:0;">${esc(c.name)}</h2>
+                                <span class="badge">Login da turma</span>
+                                <div class="points ${c.points < 0 ? 'negative' : 'positive'}" style="font-size:28px;">${c.points} pontos</div>
+                                <div class="muted">🏆 Posição: ${pos}º lugar</div>
+                            </div>
+                        </div>
+                        ${isBlocked ? 
+                            `<p class="muted mt-8" style="color:#f28c28;">🔒 As pontuações das outras turmas estão ocultas.</p>` :
+                            `<p class="muted mt-8">Você pode consultar sua pontuação e o ranking. Somente a direção pode alterar pontos.</p>`
+                        }
+                    </div>
+                    <div class="card">
+                        <h2>🏆 Posição no ranking</h2>
+                        ${rank(isBlocked)} 
+                    </div>
+                `;
+            }
+        }
+
+        function placeholder(name) {
+            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+                `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="100%" height="100%" fill="#16824b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="42" font-family="Arial">${name}</text></svg>`
+            );
+        }
+
+        function rank(hidePoints) {
+            let list = sorted();
+            
+            // Se hidePoints for true, oculta as pontuações das outras turmas, mas mostra a da própria
+            if (hidePoints && session && session.role !== "direcao") {
+                return list.map((c, i) => {
+                    let isMy = c.id == session.classId;
+                    let pointsDisplay = isMy ? 
+                        `<strong class="${c.points < 0 ? 'negative' : 'positive'}">${c.points} pts</strong>` :
+                        `<span class="points-hidden">••• pts</span>`;
+                    
+                    return `
+                        <div class="rank ${isMy ? 'my-class' : ''}">
+                            <div class="pos">${i + 1}º</div>
+                            <img src="${c.image || placeholder(c.name)}" alt="${esc(c.name)}">
+                            <div style="flex:1;min-width:60px;">
+                                <b>${esc(c.name)}</b> ${isMy ? '⭐' : ''}
+                                <br><span class="badge">Turma</span>
+                            </div>
+                            ${pointsDisplay}
+                        </div>
+                    `;
+                }).join("");
+            }
+
+            // Se hidePoints for false, mostra TODAS as pontuações
+            return list.map((c, i) => `
+                <div class="rank">
+                    <div class="pos">${i + 1}º</div>
+                    <img src="${c.image || placeholder(c.name)}" alt="${esc(c.name)}">
+                    <div style="flex:1;min-width:60px;">
+                        <b>${esc(c.name)}</b><br>
+                        <span class="badge">Turma</span>
+                    </div>
+                    <strong class="${c.points < 0 ? 'negative' : 'positive'}">${c.points} pts</strong>
+                </div>
+            `).join("");
+        }
+
+        function openM(x) {
+            modal.innerHTML = `
+                <div class="modal" onclick="if(event.target===this)closeM()">
+                    <div class="box">${x}<br><button class="gray" onclick="closeM()" style="margin-top:10px;">Cancelar</button></div>
+                </div>
+            `;
+        }
+
+        function closeM() {
+            modal.innerHTML = "";
+        }
+
+        // CLASSES
+        function classModal(id) {
+            let c = id ? cls(id) : { name: "", image: "", username: "", password: "" };
+            openM(`
+                <h2>${id ? "Editar" : "Cadastrar"} turma</h2>
+                <label>Nome</label>
+                <input id="cn" value="${esc(c.name)}" placeholder="Ex.: 3°B">
+                <label>Brasão / imagem</label>
+                <input id="file" type="file" accept="image/*" onchange="readImage(event)">
+                <input id="imageData" type="hidden" value="${esc(c.image || "")}">
+                <img id="prev" class="preview" src="${c.image || placeholder(c.name || "Turma")}" alt="Preview">
+                <label>Usuário da turma</label>
+                <input id="cu" value="${esc(c.username)}" placeholder="Ex.: 3B">
+                <label>Senha da turma</label>
+                <input id="cp" value="${esc(c.password)}" placeholder="Senha">
+                <button class="green w-full" onclick="saveClass(${id || 0})">Salvar turma</button>
+            `);
+        }
+
+        function readImage(e) {
+            let f = e.target.files[0];
+            if (!f) return;
+            if (!f.type.startsWith("image/")) return alert("Selecione uma imagem.");
+            if (f.size > 4 * 1024 * 1024) return alert("Imagem de até 4 MB.");
+            let r = new FileReader();
+            r.onload = () => {
+                imageData.value = r.result;
+                prev.src = r.result;
+            };
+            r.readAsDataURL(f);
+        }
+
+        function saveClass(id) {
+            let n = cn.value.trim();
+            let im = imageData.value;
+            let u = cu.value.trim();
+            let p = cp.value;
+            if (!n || !im || !u || !p) return alert("Preencha nome, brasão, usuário e senha.");
+            if (db.users.some(x => x.username === u && (!id || x.classId != id))) {
+                return alert("Esse usuário já existe.");
+            }
+
+            if (id) {
+                let c = cls(id);
+                c.name = n;
+                c.image = im;
+                c.username = u;
+                c.password = p;
+                let us = db.users.find(x => x.classId == id);
+                if (us) { us.username = u;
+                    us.password = p; }
+                log("Edição", "Turma " + n + " e seu login");
+            } else {
+                let cid = Date.now();
+                db.classes.push({ id: cid, name: n, image: im, points: 0, username: u, password: p });
+                db.users.push({ id: "u" + cid, username: u, password: p, role: "turma", classId: cid });
+                log("Criação", "Turma " + n + " e login " + u);
+            }
+            save();
+            closeM();
+            show("classes");
+        }
+
+        function delClass(id) {
+            let c = cls(id);
+            if (!confirm("Excluir " + c.name + " e seu login?")) return;
+            db.classes = db.classes.filter(x => x.id != id);
+            db.users = db.users.filter(x => x.classId != id);
+            db.scores = db.scores.filter(x => x.c != id);
+            log("Exclusão", "Turma " + c.name + " e seu login");
+            save();
+            show("classes");
+        }
+
+        // USERS
+        function userModal(id) {
+            let c = cls(id);
+            openM(`
+                <h2>${id ? "Alterar login" : "Criar login de turma"}</h2>
+                <label>Turma</label>
+                <select id="uc">
+                    ${db.classes.map(x => `<option value="${x.id}" ${id == x.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}
+                </select>
+                <label>Usuário</label>
+                <input id="uu" value="${esc(c?.username || "")}" placeholder="Usuário">
+                <label>Senha</label>
+                <input id="up" value="${esc(c?.password || "")}" placeholder="Senha">
+                <button class="green w-full" onclick="saveUser(${id || 0})">Salvar acesso</button>
+            `);
+        }
+
+        function saveUser(id) {
+            let c = cls(uc.value);
+            let u = uu.value.trim();
+            let p = up.value;
+            if (!c || !u || !p) return alert("Preencha os dados.");
+            if (db.users.some(x => x.username === u && x.classId != c.id)) {
+                return alert("Usuário já usado.");
+            }
+            c.username = u;
+            c.password = p;
+            let us = db.users.find(x => x.classId == c.id);
+            if (us) { us.username = u;
+                us.password = p; } else {
+                db.users.push({ id: "u" + Date.now(), username: u, password: p, role: "turma", classId: c.id });
+            }
+            log("Login", "Acesso da turma " + c.name + " atualizado");
+            save();
+            closeM();
+            show("users");
+        }
+
+        // ACTIVITIES
+        function activityModal(id) {
+            let x = id ? db.activities.find(a => a.id == id) : { name: "", description: "", defaultValue: 20 };
+            openM(`
+                <h2>${id ? "Editar" : "Nova"} atividade</h2>
+                <label>Nome</label>
+                <input id="an" value="${esc(x.name)}" placeholder="Ex.: Prova 1">
+                <label>Descrição</label>
+                <input id="ad" value="${esc(x.description)}" placeholder="Descrição da atividade">
+                <label>Valor padrão</label>
+                <div class="flex-row">
+                    <input id="adef" type="number" value="${x.defaultValue || 20}" step="1">
+                    <span class="muted">Use números positivos ou negativos</span>
+                </div>
+                <span class="hint">💡 Este valor será preenchido automaticamente no lançamento, mas pode ser editado.</span>
+                <button class="orange w-full" onclick="saveActivity(${id || 0})">Salvar</button>
+            `);
+        }
+
+        function saveActivity(id) {
+            let n = an.value.trim();
+            let d = ad.value.trim();
+            let def = Number(adef.value);
+            if (!n) return alert("Preencha o nome da atividade.");
+            if (!Number.isFinite(def) || def === 0) return alert("O valor padrão não pode ser zero.");
+
+            if (id) {
+                let x = db.activities.find(a => a.id == id);
+                Object.assign(x, { name: n, description: d, defaultValue: def });
+                log("Edição", "Atividade " + n + " (valor padrão: " + (def > 0 ? '+' : '') + def + ")");
+            } else {
+                db.activities.push({ id: Date.now(), name: n, description: d, defaultValue: def });
+                log("Criação", "Atividade " + n + " (valor padrão: " + (def > 0 ? '+' : '') + def + ")");
+            }
+            save();
+            closeM();
+            show("activities");
+        }
+
+        function delActivity(id) {
+            let x = db.activities.find(a => a.id == id);
+            if (!confirm("Excluir " + x.name + "?")) return;
+            db.activities = db.activities.filter(a => a.id != id);
+            db.scores = db.scores.filter(s => s.a != id);
+            recalc();
+            log("Exclusão", "Atividade " + x.name);
+            save();
+            show("activities");
+        }
+
+        // SCORES
+        function scoreModal() {
+            if (db.activities.length === 0) {
+                alert("Cadastre uma atividade primeiro!");
+                return;
+            }
+            if (db.classes.length === 0) {
+                alert("Cadastre uma turma primeiro!");
+                return;
+            }
+            openM(`
+                <h2>Lançar pontuação</h2>
+                <label>Turma</label>
+                <select id="sc">
+                    ${db.classes.map(c => `<option value="${c.id}">${esc(c.name)} — ${c.points} pts</option>`).join("")}
+                </select>
+                <label>Atividade</label>
+                <select id="sa" onchange="updateDefaultScore()">
+                    ${db.activities.map(a => `
+                        <option value="${a.id}" data-default="${a.defaultValue || 20}">
+                            ${esc(a.name)} — padrão: ${a.defaultValue > 0 ? '+' : ''}${a.defaultValue}
+                        </option>
+                    `).join("")}
+                </select>
+                <label>Pontos (use valores positivos ou negativos)</label>
+                <div class="flex-row">
+                    <input id="sp" type="number" placeholder="Ex.: 20 ou -10" value="${db.activities[0].defaultValue || 20}" step="1">
+                    <span class="muted">Valor padrão da atividade</span>
+                </div>
+                <span class="hint">💡 Você pode editar este valor antes de salvar.</span>
+                <button class="orange w-full" onclick="saveScore()">Registrar</button>
+            `);
+            updateDefaultScore();
+        }
+
+        function updateDefaultScore() {
+            let sel = document.getElementById('sa');
+            let input = document.getElementById('sp');
+            if (sel && input) {
+                let opt = sel.options[sel.selectedIndex];
+                let def = opt ? parseFloat(opt.dataset.default) || 20 : 20;
+                input.value = def;
+            }
+        }
+
+        function saveScore() {
+            let p = parseFloat(sp.value);
+            let c = cls(sc.value);
+            let a = db.activities.find(x => x.id == sa.value);
+            if (!Number.isFinite(p) || p === 0) return alert("Informe um valor diferente de zero.");
+            
+            if (p > 0 && p > Math.abs(a.defaultValue)) {
+                return alert("O valor positivo (" + p + ") ultrapassa o máximo da atividade (" + Math.abs(a.defaultValue) + ").");
+            }
+
+            c.points += p;
+            db.scores.push({
+                id: Date.now(),
+                c: c.id,
+                a: a.id,
+                p: p,
+                date: new Date().toLocaleDateString("pt-BR")
+            });
+            log("Pontuação", `${c.name}: ${p > 0 ? "+" : ""}${p} em ${a.name}`);
+            save();
+            closeM();
+            show("scores");
+        }
+
+        function removeScore(id) {
+            let i = db.scores.findIndex(s => s.id == id);
+            if (i < 0) return;
+            let s = db.scores[i];
+            let c = cls(s.c);
+            if (!confirm("Excluir lançamento?")) return;
+            c.points -= s.p;
+            db.scores.splice(i, 1);
+            log("Exclusão", "Pontuação de " + c.name);
+            save();
+            show("scores");
+        }
+
+        function recalc() {
+            db.classes.forEach(c => {
+                c.points = db.scores.filter(s => s.c == c.id).reduce((s, x) => s + x.p, 0);
+            });
+        }
+
+        function toggleRankingBlock() {
+            db.settings.blockRanking = !db.settings.blockRanking;
+            log("Configuração", `Ranking ${db.settings.blockRanking ? 'ocultou' : 'exibiu'} pontuações das outras turmas`);
+            save();
+            // Atualiza a página atual para refletir a mudança
+            show(page);
+        }
+
+        // Inicialização
+        buildNav();
+    </script>
+</body>
+
+</html>
