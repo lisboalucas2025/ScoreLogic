@@ -4,6 +4,7 @@ session_start();
 require_once('conexao.php');
 
 // ==================== FUNÇÕES AUXILIARES ====================
+// Teste Git hub
 
 function getTurmas($pdo)
 {
